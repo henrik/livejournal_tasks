@@ -58,7 +58,7 @@ module LiveJournal
     #  :body       The post contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
     #  :tags       An array of strings. Alias for :taglist.
     #  :time       A Time object. LiveJournal will use the time as-is, ignoring the time zone. Can be past or future.
-    #  :mood       A string.
+    #  :mood       A string. TODO: Is currently reset on next update unless specified every time.
     #  :music      A string.
     #  :location   A string.
     #  :security   One of: :public, :friends, :private, :custom (pass an :allowmask integer with :custom).
