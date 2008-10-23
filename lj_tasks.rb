@@ -24,8 +24,24 @@
 #   lj.entry(1)    # LiveJournal::Entry with that id.
 #   lj.url(1)      # LiveJournal URL for the entry with that id.
 #
+#   lj.create(:subject => "Foo", :body => "Bar")  # Returns the entry id, an integer.
 #   lj.update(1, :body => "Baz")  # Update the entry with that id.
 #   lj.delete(1)   # Remove the entry with that id.
+#
+# Properties for #create and #update:
+#
+#  :subject       A string.
+#  :body          The post contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
+#  :tags          An array of strings. Alias for :taglist.
+#  :time          A Time object. LiveJournal will use the time as-is, ignoring the time zone. Can be past or future.
+#  :mood          A string. TODO: Is currently reset on update unless specified every time.
+#  :music         A string.
+#  :location      A string.
+#  :pickeyword    User picture keyword. A string.
+#  :security      One of: :public, :friends, :private, :custom (pass an :allowmask integer with :custom).
+#  :comments      One of: :normal, :none, :noemail
+#  :screening     One of: :default, :all, :anonymous, :nonfriends, :none
+#  :preformatted  Boolean. Tells LJ not to touch your HTML. Defaults to true if you update the body.
 
 require 'rubygems'
 require 'livejournal/entry'
@@ -33,6 +49,7 @@ require 'livejournal/entry'
 module LiveJournal
   class Tasks
     class NoSuchProperty < StandardError; end
+    class BodyRequired < StandardError; end
     
     def initialize(username, password)
       @username = username
@@ -55,24 +72,34 @@ module LiveJournal
       entry(id).url(@user)
     end
     
-    # Pass the id of an entry and a hash with any of these properties to update them.
-    # Anything you don't pass is not changed (except for a :mood issue, see below).
-    #
-    #  :subject       A string.
-    #  :body          The post contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
-    #  :tags          An array of strings. Alias for :taglist.
-    #  :time          A Time object. LiveJournal will use the time as-is, ignoring the time zone. Can be past or future.
-    #  :preformatted  Boolean. Tells LJ not to touch your HTML. Defaults to true if you update the body.
-    #  :mood          A string. TODO: Is currently reset on next update unless specified every time.
-    #  :music         A string.
-    #  :location      A string.
-    #  :pickeyword    User picture keyword. A string.
-    #  :security      One of: :public, :friends, :private, :custom (pass an :allowmask integer with :custom).
-    #  :comments      One of: :normal, :none, :noemail
-    #  :screening     One of: :default, :all, :anonymous, :nonfriends, :none
+    # Pass a hash of properties to create an entry. The :body is required. If you don't set
+    # a :subject, a date string like "Jan. 1st, 2009" will be used.
+    def create(properties={})
+      entry = LiveJournal::Entry.new
+      properties[:time] ||= Time.now
+      unless properties[:body]
+        raise BodyRequired, "You must pass a :body."
+      end
+      assign_properties(entry, properties)
+      LiveJournal::Request::PostEvent.new(@user, entry).run
+      entry.itemid
+    end
+    
+    # Pass the id of an entry and a hash of properties to update them. Anything you don't pass
+    # is not changed (except for :mood that is currently reset if not passed every time).
     def update(id, properties={})
       entry = entry(id)
-      
+      assign_properties(entry, properties)
+      LiveJournal::Request::EditEvent.new(@user, entry).run
+    end
+    
+    def delete(id)
+      LiveJournal::Request::EditEvent.new(@user, entry(id), :delete => true).run
+    end
+    
+  protected
+  
+    def assign_properties(entry, properties)
       if properties[:time].is_a?(Time)
         properties[:time] = LiveJournal.coerce_gmt(properties[:time])
       end
@@ -94,11 +121,6 @@ module LiveJournal
           raise NoSuchProperty, %{Entries don't have the "#{key}" property.}
         end
       end
-      LiveJournal::Request::EditEvent.new(@user, entry).run
-    end
-    
-    def delete(id)
-      LiveJournal::Request::EditEvent.new(@user, entry(id), :delete => true).run
     end
     
   end
