@@ -20,6 +20,7 @@
 #   lj.entries     # Hash of the last 10 entries, with id keys and LiveJournal::Entry values.
 #   lj.entries(5)  # Hash of the last 5 entries.
 #   lj.entry(1)    # LiveJournal::Entry with that id.
+#   lj.url(1)      # LiveJournal URL for the entry with that id.
 #   lj.delete(1)   # Remove the entry with that id.
 #   lj.update(1, :subject => "Foo", :body => "Bar")  # Update the entry with that id. See below for details.
 
@@ -44,6 +45,11 @@ module LiveJournal
     # Get the LiveJournal::Entry with a given id.
     def entry(id)
       LiveJournal::Request::GetEvents.new(@user, :itemid => id, :strict => false).run
+    end
+    
+    # Get the LiveJournal URL (e.g. http://foo.livejournal.com/123.html) for the entry with a given id.
+    def url(id)
+      entry(id).url(@user)
     end
     
     # Pass the id of an entry and a hash with any of these properties to update them:
