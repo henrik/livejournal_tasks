@@ -54,6 +54,7 @@ module LiveJournal
     #  :time       A Time object. LiveJournal will use the time as-is, ignoring the time zone. Can be past or future.
     #  :mood       A string.
     #  :music      A string.
+    #  :location   A string.
     #  :security   One of: :public, :friends, :private, :custom (pass an :allowmask integer with :custom).
     #  :comments   One of: :normal, :none, :noemail
     #  :screening  One of: :default, :all, :anonymous, :nonfriends, :none
