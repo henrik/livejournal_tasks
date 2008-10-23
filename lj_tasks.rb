@@ -1,6 +1,6 @@
 # Thin wrapper around Evan Martin's livejournal gem
 # (http://neugierig.org/software/livejournal/ruby/)
-# to make it more task-oriented and easier to use.
+# to make a more task-oriented and easier to use lib.
 #
 # See the gem documentation for more details, if you need them:
 # http://neugierig.org/software/livejournal/ruby/doc/
