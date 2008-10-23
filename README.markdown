@@ -7,7 +7,7 @@ Tasks will be added as I need them. Please fork this project and add your own.
 The current tasks are ones I needed for cross-posting: having a non-LJ blog create and update mirror LiveJournal posts.
 
 
-See [the gem documentation](http://neugierig.org/software/livejournal/ruby/doc/) for more details on classes like `LiveJournal::Entry`.
+See [the gem documentation](http://neugierig.org/software/livejournal/ruby/doc/) for more details on the underlying stuff.
 
 
 ## Setup
