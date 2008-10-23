@@ -17,12 +17,15 @@
 # Example usage:
 #
 #   lj = LiveJournal::Tasks.new('username', 'password')
+#
 #   lj.entries     # Hash of the last 10 entries, with id keys and LiveJournal::Entry values.
 #   lj.entries(5)  # Hash of the last 5 entries.
+#
 #   lj.entry(1)    # LiveJournal::Entry with that id.
 #   lj.url(1)      # LiveJournal URL for the entry with that id.
+#
+#   lj.update(1, :body => "Baz")  # Update the entry with that id.
 #   lj.delete(1)   # Remove the entry with that id.
-#   lj.update(1, :subject => "Foo", :body => "Bar")  # Update the entry with that id. See below for details.
 
 require 'rubygems'
 require 'livejournal/entry'
@@ -52,18 +55,21 @@ module LiveJournal
       entry(id).url(@user)
     end
     
-    # Pass the id of an entry and a hash with any of these properties to update them:
+    # Pass the id of an entry and a hash with any of these properties to update them.
+    # Anything you don't pass is not changed (except for a :mood issue, see below).
     #
-    #  :subject    A string.
-    #  :body       The post contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
-    #  :tags       An array of strings. Alias for :taglist.
-    #  :time       A Time object. LiveJournal will use the time as-is, ignoring the time zone. Can be past or future.
-    #  :mood       A string. TODO: Is currently reset on next update unless specified every time.
-    #  :music      A string.
-    #  :location   A string.
-    #  :security   One of: :public, :friends, :private, :custom (pass an :allowmask integer with :custom).
-    #  :comments   One of: :normal, :none, :noemail
-    #  :screening  One of: :default, :all, :anonymous, :nonfriends, :none
+    #  :subject       A string.
+    #  :body          The post contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
+    #  :tags          An array of strings. Alias for :taglist.
+    #  :time          A Time object. LiveJournal will use the time as-is, ignoring the time zone. Can be past or future.
+    #  :preformatted  Boolean. Tells LJ not to touch your HTML. Defaults to true if you update the body.
+    #  :mood          A string. TODO: Is currently reset on next update unless specified every time.
+    #  :music         A string.
+    #  :location      A string.
+    #  :pickeyword    User picture keyword. A string.
+    #  :security      One of: :public, :friends, :private, :custom (pass an :allowmask integer with :custom).
+    #  :comments      One of: :normal, :none, :noemail
+    #  :screening     One of: :default, :all, :anonymous, :nonfriends, :none
     def update(id, properties={})
       entry = entry(id)
       
@@ -75,6 +81,9 @@ module LiveJournal
       end
       if tags = properties.delete(:tags)
         properties[:taglist] ||= tags
+      end
+      if properties.has_key?(:event)
+        properties[:preformatted] ||= true
       end
       
       properties.each do |key, value|
