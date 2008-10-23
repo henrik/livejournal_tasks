@@ -58,15 +58,21 @@ module LiveJournal
   protected
   
     def assign_properties(entry, properties)
+      # So LJ doesn't complain about future posts when making earlier ones.
+      if properties[:time] && properties[:time] > Time.now
+        properties[:backdated] = true
+      end
       if properties[:time].is_a?(Time)
         properties[:time] = LiveJournal.coerce_gmt(properties[:time])
       end
+
       if body = properties.delete(:body)
         properties[:event] ||= body
       end
       if tags = properties.delete(:tags)
         properties[:taglist] ||= tags
       end
+
       if properties.has_key?(:event)
         properties[:preformatted] ||= true
       end
