@@ -48,7 +48,7 @@ Properties for `create` and `update`:
     :mood          A string.
     :music         A string.
     :location      A string.
-    :pickeyword    User picture keyword. A string.
+    :picture       User picture keyword. A string. Alias for :pickeyword.
     :security      One of: :public, :friends, :private, :custom (pass an :allowmask integer with :custom).
     :comments      One of: :normal, :none, :noemail
     :screening     One of: :default, :all, :anonymous, :nonfriends, :none

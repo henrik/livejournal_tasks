@@ -11,6 +11,8 @@ module LiveJournal
     alias_method :body=, :event=
     alias_method :tags, :taglist
     alias_method :tags=, :taglist=
+    alias_method :picture, :pickeyword
+    alias_method :picture=, :pickeyword=
     
     alias_method :old_load_prop, :load_prop
     def load_prop(name, value, strict=false)
