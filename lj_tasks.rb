@@ -110,13 +110,6 @@ module LiveJournal
         properties[:time] = LiveJournal.coerce_gmt(properties[:time])
       end
 
-      if body = properties.delete(:body)
-        properties[:event] ||= body
-      end
-      if tags = properties.delete(:tags)
-        properties[:taglist] ||= tags
-      end
-
       if properties.has_key?(:event)
         properties[:preformatted] ||= true
       end
