@@ -29,7 +29,7 @@ Then `require` this library.
     lj.entry(1)    # LiveJournal::Entry with that id.
     lj.url(1)      # LiveJournal URL for the entry with that id.
 
-    lj.create(:subject => "Foo", :body => "Bar")  # Returns the entry id, an integer.
+    lj.create(:subject => "Foo", :body => "Bar")  # Post a new entry. Returns the entry id, an integer.
     lj.update(1, :body => "Baz")  # Update the entry with that id.
     lj.delete(1)   # Remove the entry with that id.
 
