@@ -37,7 +37,7 @@ Properties for `create` and `update`:
 
     :subject       A string.
     :body          The entry contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
-    :tags          An array of strings. Alias for :taglist.
+    :tags          An array of strings. Alias for :taglist. Stored comma-separated, so no commas.
     :time          A Time. LJ will use the time as-is, ignoring the time zone. Can be past or future. Defaults to now on create.
     :mood          A string.
     :music         A string.
