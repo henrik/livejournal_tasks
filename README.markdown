@@ -4,7 +4,7 @@ This Ruby library is a thin wrapper around [Evan Martin's livejournal gem](http:
 
 Tasks will be added as I need them. Please fork this project and add your own.
 
-The current tasks are ones I needed for cross-posting: having a non-LJ blog create and update mirror LiveJournal posts.
+The current tasks are ones I needed for cross-posting: having a non-LJ blog create and update mirror LiveJournal entries.
 
 
 See [the gem documentation](http://neugierig.org/software/livejournal/ruby/doc/) for more details on the underlying stuff.
@@ -36,7 +36,7 @@ Then `require` this library.
 Properties for `create` and `update`:
 
     :subject       A string.
-    :body          The post contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
+    :body          The entry contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
     :tags          An array of strings. Alias for :taglist.
     :time          A Time. LJ will use the time as-is, ignoring the time zone. Can be past or future. Defaults to now on create.
     :mood          A string. TODO: Is currently reset on update unless specified every time.

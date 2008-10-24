@@ -58,7 +58,7 @@ module LiveJournal
   protected
   
     def assign_properties(entry, properties)
-      # So LJ doesn't complain about future posts when making earlier ones.
+      # So LJ doesn't complain about future entries when making earlier ones.
       if properties[:time] && properties[:time] > Time.now
         properties[:backdated] = true
       end
