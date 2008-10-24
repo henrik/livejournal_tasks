@@ -25,6 +25,7 @@ module LiveJournal
   end
   
   class Tasks
+    class NoSuchEntry < StandardError; end
     class NoSuchProperty < StandardError; end
     class BodyRequired < StandardError; end
     
@@ -42,7 +43,8 @@ module LiveJournal
     
     # Get the LiveJournal::Entry with a given id.
     def entry(id)
-      LiveJournal::Request::GetEvents.new(@user, :itemid => id, :strict => false).run
+      LiveJournal::Request::GetEvents.new(@user, :itemid => id, :strict => false).run ||
+        raise(NoSuchEntry, "There is no entry with that id.")
     end
     
     # Get the LiveJournal URL (e.g. http://foo.livejournal.com/123.html) for the entry with a given id.
