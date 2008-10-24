@@ -34,8 +34,8 @@ Then `require` this library.
     lj.update(1, :body => "Baz")  # Update the entry with that id.
     # Pass a block for more advanced updates.
     lj.update(1, :subject => "New") {|entry| entry.body = entry.body.gsub('x', 'y') }
-    # If the block returns "false", the update isn't run. LJ uses GMT, so use Time.gm.
-    lj.update(1, :security => :private) {|entry| entry.time < Time.gm(2005) }
+    # If the block returns "false", the update isn't run.
+    lj.update(1, :security => :private) {|entry| entry.time < Time.gm(2005) }  # LJ uses GMT, so use Time.gm.
     lj.update_all(:security => :private) {|entry| entry.time < Time.gm(2005) }  # Batch updates.
 
 
