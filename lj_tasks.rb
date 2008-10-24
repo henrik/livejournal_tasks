@@ -7,6 +7,11 @@ require 'livejournal/entry'  # sudo gem install livejournal
 module LiveJournal
   
   class Entry  # reopening
+    alias_method :body, :event
+    alias_method :body=, :event=
+    alias_method :tags, :taglist
+    alias_method :tags=, :taglist=
+    
     alias_method :old_load_prop, :load_prop
     def load_prop(name, value, strict=false)
       old_load_prop(name, value, strict)
@@ -27,8 +32,9 @@ module LiveJournal
       @user = LiveJournal::User.new(username, password)
     end
     
-    # Get the last +limit+ entries.
-    def entries(limit=10)
+    # Get all entries. Pass a +limit+ to only get that many (the most recent).
+    def entries(limit=nil)
+      limit ||= -1
       LiveJournal::Request::GetEvents.new(@user, :recent => limit, :strict => false).run
     end
     
@@ -55,12 +61,35 @@ module LiveJournal
       entry.itemid
     end
     
-    # Pass the id of an entry and a hash of properties to update them. Anything you don't pass
-    # is not changed.
-    def update(id, properties={})
+    # Pass the id of an entry and a hash of properties to update them.
+    # Anything you don't pass is not changed. Pass a block for more power.
+    # If the block returns false (but not nil), the +properties+ are not assigned.
+    # The entry.time will always be in GMT, so use +Time.gm+ for time comparisons.
+    #   lj.update(1, :subject => "New") {|entry| entry.body = entry.body.gsub('x', 'y') }
+    #   lj.update(1, :security => :private) {|entry| entry.time < Time.gm(2005) }
+    def update(id, properties={}, &block)
       entry = entry(id)
       assign_properties(entry, properties)
+      if block_given?
+        b = block.call(entry)
+        return if b == false
+      end
       LiveJournal::Request::EditEvent.new(@user, entry).run
+      entry
+    end
+    
+    # Update all entries, assigning these properties. Takes a block just like +update+.
+    # See that method for details.
+    def update_all(properties={}, &block)
+      # Since this may take a while, establish "now" at this point, and use that in comparisons
+      # to determine whether or not to backdate.
+      properties = properties.merge(:now => Time.now)
+      updates = []
+      entries.each do |id, entry|
+        u = update(id, properties, &block)
+        updates << u if u
+      end
+      updates
     end
     
     def delete(id)
@@ -71,7 +100,8 @@ module LiveJournal
   
     def assign_properties(entry, properties)
       # So LJ doesn't complain about entries out of time.
-      if properties[:time] && properties[:time] != Time.now
+      now = properties.delete(:now) || Time.now
+      if properties[:time] && properties[:time] != now
         properties[:backdated] = true
       end
       if properties[:time].is_a?(Time)

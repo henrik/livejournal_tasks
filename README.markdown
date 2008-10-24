@@ -4,8 +4,7 @@ This Ruby library is a thin wrapper around [Evan Martin's livejournal gem](http:
 
 Tasks will be added as I need them. Please fork this project and add your own.
 
-The current tasks are ones I needed for cross-posting: having a non-LJ blog create and update mirror LiveJournal entries.
-
+The current tasks are ones I needed for cross-posting (having a non-LJ blog create and update mirror LiveJournal entries) and batch editing of entries.
 
 See [the gem documentation](http://neugierig.org/software/livejournal/ruby/doc/) for more details on the underlying stuff.
 
@@ -23,15 +22,22 @@ Then `require` this library.
 
     lj = LiveJournal::Tasks.new('username', 'password')
 
-    lj.entries     # Hash of the last 10 entries, with id keys and LiveJournal::Entry values.
+    lj.entries     # Hash of all entries, with id keys and LiveJournal::Entry values.
     lj.entries(5)  # Hash of the last 5 entries.
 
     lj.entry(1)    # LiveJournal::Entry with that id.
     lj.url(1)      # LiveJournal URL for the entry with that id.
 
     lj.create(:subject => "Foo", :body => "Bar")  # Post a new entry. Returns the entry id, an integer.
-    lj.update(1, :body => "Baz")  # Update the entry with that id.
     lj.delete(1)   # Remove the entry with that id.
+
+    lj.update(1, :body => "Baz")  # Update the entry with that id.
+    # Pass a block for more advanced updates.
+    lj.update(1, :subject => "New") {|entry| entry.body = entry.body.gsub('x', 'y') }
+    # If the block returns "false", the update isn't run. LJ uses GMT, so use Time.gm.
+    lj.update(1, :security => :private) {|entry| entry.time < Time.gm(2005) }
+    lj.update_all(:security => :private) {|entry| entry.time < Time.gm(2005) }  # Batch updates.
+
 
 Properties for `create` and `update`:
 
