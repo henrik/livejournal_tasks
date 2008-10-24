@@ -5,6 +5,18 @@ require 'rubygems'
 require 'livejournal/entry'  # sudo gem install livejournal
 
 module LiveJournal
+  
+  class Entry  # reopening
+    alias_method :old_load_prop, :load_prop
+    def load_prop(name, value, strict=false)
+      old_load_prop(name, value, strict)
+      case name
+      when 'current_mood'
+        @mood = value  # fix value.to_i bug in gem
+      end
+    end
+  end
+  
   class Tasks
     class NoSuchProperty < StandardError; end
     class BodyRequired < StandardError; end
@@ -44,7 +56,7 @@ module LiveJournal
     end
     
     # Pass the id of an entry and a hash of properties to update them. Anything you don't pass
-    # is not changed (except for :mood that is currently reset if not passed every time).
+    # is not changed.
     def update(id, properties={})
       entry = entry(id)
       assign_properties(entry, properties)
