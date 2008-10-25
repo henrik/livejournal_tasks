@@ -42,13 +42,13 @@ Then `require` this library.
 Properties for `create` and `update`:
 
     :subject       A string.
-    :body          The entry contents. Alias for :event. Passing nil or "" raises AccidentalDeleteError.
-    :tags          An array of strings. Alias for :taglist. Stored comma-separated, so no commas.
+    :body          The entry contents. Passing nil or "" raises AccidentalDeleteError.
+    :tags          An array of strings. Stored comma-separated, so no commas.
     :time          A Time. LJ will use the time as-is, ignoring the time zone. Can be past or future. Defaults to now on create.
     :mood          A string.
     :music         A string.
     :location      A string.
-    :picture       User picture keyword. A string. Alias for :pickeyword.
+    :picture       User picture keyword. A string.
     :security      One of: :public, :friends, :private, :custom (pass an :allowmask integer with :custom).
     :comments      One of: :normal, :none, :noemail
     :screening     One of: :default, :all, :anonymous, :nonfriends, :none
