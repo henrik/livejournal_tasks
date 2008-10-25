@@ -112,7 +112,7 @@ module LiveJournal
         properties[:time] = LiveJournal.coerce_gmt(properties[:time])
       end
 
-      if properties.has_key?(:event)
+      if properties.has_key?(:body)
         properties[:preformatted] ||= true
       end
       
