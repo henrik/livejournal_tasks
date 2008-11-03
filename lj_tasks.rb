@@ -103,13 +103,21 @@ module LiveJournal
   protected
   
     def assign_properties(entry, properties)
-      # So LJ doesn't complain about entries out of time.
-      now = properties.delete(:now) || Time.now
-      if properties[:time] && properties[:time] != now
-        properties[:backdated] = true
-      end
-      if properties[:time].is_a?(Time)
+      # So LJ doesn't complain about entries out of time. Entries are backdated
+      # if the :time is set to something other than the previous value or the
+      # current time (with a grace period of +/- one minute to account for delays
+      # and for LJ rounding to full minutes). If this logic doesn't work for
+      # you, explicitly pass a :backdated bool and that will be respected.
+      if properties[:time]
         properties[:time] = LiveJournal.coerce_gmt(properties[:time])
+        
+        unless properties.has_key?(:backdated)
+          now = LiveJournal.coerce_gmt(properties.delete(:now) || Time.now)
+          expected_time = entry.time || now
+          unless expected_time-60 < properties[:time] && properties[:time] <= expected_time+60  # grace period
+            properties[:backdated] = true
+          end
+        end
       end
 
       if properties.has_key?(:body)
